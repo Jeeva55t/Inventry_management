@@ -1,0 +1,8 @@
+<h2>Update Product</h2>
+<form method="POST">
+    Product ID: <strong>{{ product[0] }}</strong><br><br>
+    Product Name: <input type="text" name="product_name" value="{{ product[1] }}"><br><br>
+    Quantity: <input type="number" name="quantity" value="{{ product[2] }}"><br><br>
+    <input type="submit" value="Update Product">
+</form>
+<a href="/products">Back</a> | <a href="/logout">Logout</a>
