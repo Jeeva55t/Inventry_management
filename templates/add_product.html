@@ -1,9 +1,9 @@
-<div style="text-align: center;">   
-    <h2>Add Product</h2>
-    <form method="POST">
-        Product ID: <input type="text" name="product_id"><br><br>
-        Product Name: <input type="text" name="product_name"><br><br>
-        <input type="submit" value="Add Product">
-    </form>
-    <a href="/products">View All Products</a> | <a href="/logout">Logout</a>
-</div>
+{% extends "base.html" %}
+{% block content %}
+<h2>Add Product</h2>
+<form method="post">
+    <input type="text" name="product_name" placeholder="Product Name" required class="form-control mb-2">
+    <input type="number" name="quantity" placeholder="Initial Quantity" class="form-control mb-2">
+    <button type="submit" class="btn btn-success">Add Product</button>
+</form>
+{% endblock %}

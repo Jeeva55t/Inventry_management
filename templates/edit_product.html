@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit Product</h2>
+<form method="post">
+    <input type="text" name="product_name" value="{{ product[1] }}" class="form-control mb-2">
+    <input type="number" name="quantity" value="{{ product[2] }}" class="form-control mb-2">
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+{% endblock %}

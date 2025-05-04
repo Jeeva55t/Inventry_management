@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Warehouse Stock</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product ID</th>
+            <th>Product</th>
+            <th>Available Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for val in warehouse_data %}
+        <tr>
+            <td>{{ val[0] }}</td>
+            <td>{{ val[1] }}</td>
+            <td>{{ val[2] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+
+
+<h2>Inventory Report</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Location</th>
+            <th>Available Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in report_data %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
