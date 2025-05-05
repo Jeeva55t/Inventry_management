@@ -1,19 +1,54 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home page</title>
-
-    <a href="{{ url_for('add_product') }}">Add Product</a><br><br>
-    <a href="{{ url_for('view_products') }}">View All Products</a><br><br>
-    <a href="{{ url_for('update_product') }}">Update Product</a><br><br>
-    <a href="{{ url_for('delete_product') }}">Delete Product</a><br><br>
-
-
+    <title>Inventory Management - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Inventory Management</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Section -->
+    <div class="container mt-5">
+        <h1>Welcome, {{ session['username'] }}</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <a href="{{ url_for('add_product') }}" class="btn btn-primary btn-lg btn-block">Add Product</a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('move_products') }}" class="btn btn-warning btn-lg btn-block">Move Products</a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('report') }}" class="btn btn-success btn-lg btn-block">View Report</a>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <a href="{{ url_for('add_location') }}" class="btn btn-info btn-lg btn-block">Add Location</a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('intransit') }}" class="btn btn-secondary btn-lg btn-block">In Transit</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

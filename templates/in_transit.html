@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Product Movement History</h2>
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Product</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Quantity</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for move in movements %}
+        <tr>
+            <td>{{ move[0] }}</td>
+            <td>{{ move[1] }}</td>
+            <td>{{ move[2] }}</td>
+            <td>{{ move[3] }}</td>
+            <td>{{ move[4] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
