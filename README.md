@@ -134,3 +134,18 @@ Product movement updates quantities between locations and logs the transfer in t
 
 📞 Contact
 For issues or suggestions, contact jeevanandv63@gmail.com
+
+
+## SCREENSHOTS:
+
+
+
+https://github.com/user-attachments/assets/ed592aa1-9358-4363-93fd-9d5ca0889b34
+
+
+
+![Screenshot 2025-05-05 192845](https://github.com/user-attachments/assets/9854e7f8-7a3a-40a8-84c5-d0fcefd907a3)
+![Screenshot 2025-05-05 192824](https://github.com/user-attachments/assets/4bb88a23-29cf-4c21-845a-9ba2eef7ad71)
+![Screenshot 2025-05-05 192756](https://github.com/user-attachments/assets/c73415f3-5916-488d-9d12-67fadd82d5ce)
+![Screenshot 2025-05-05 192733](https://github.com/user-attachments/assets/5f4eb6b9-5398-4564-8c32-7fed43ac776f)
+![Screenshot 2025-05-05 192715](https://github.com/user-attachments/assets/4630ddaa-a212-4a06-8081-858d59b1c5ce)
