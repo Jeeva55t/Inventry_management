@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Move Product</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label>Product</label>
+        <select name="product_id" class="form-select" required>
+            {% for product in products %}
+                <option value="{{ product[0] }}">{{ product[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>From Location</label>
+        <select name="from_location" class="form-select" required>
+            {% for location in locations %}
+                <option value="{{ location[0] }}">{{ location[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>To Location</label>
+        <select name="to_location" class="form-select" required>
+            {% for location in locations %}
+                <option value="{{ location[0] }}">{{ location[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Quantity</label>
+        <input type="number" name="quantity" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-success">Move</button>
+</form>
+{% endblock %}
+
+

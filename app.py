@@ -1,311 +1,154 @@
-from flask import Flask, request, render_template, redirect, url_for, session
-from flask_mysqldb import MySQL
-from werkzeug.security import generate_password_hash, check_password_hash
-
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+import MySQLdb
+from datetime import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'a8c4f3d6e1b749f2a0c1d76f9e38e27a'
+app.secret_key = "a8c4f3d6e1b749f2a0c1d76f9e38e27a"
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'jeeva2005$'
-app.config['MYSQL_DB'] = 'inventory'
-mysql = MySQL(app)
+db = MySQLdb.connect(host="localhost", user="root", passwd="jeeva2005$", db="inventory")
+cur = db.cursor()
 
-
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE username = %s", (username,))
-        existing_user = cur.fetchone()
-        if existing_user:
-            return "Username already exists"
-
-        # Hash the password before storing it
-        hashed_password = generate_password_hash(password)
-
-        cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
-        mysql.connection.commit()
-        cur.close()
-
+        cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+        db.commit()
+        flash('Registration successful! Please login.')
         return redirect(url_for('login'))
-    
     return render_template('register.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+        cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
         user = cur.fetchone()
-        cur.close()
-
-        if user and check_password_hash(user[1], password):  # Verify hashed password
-            session['username'] = username
-            return redirect(url_for('view_products'))
+        if user:
+            session['user'] = username
+            return redirect(url_for('home'))
         else:
-            return "Invalid credentials"
-
+            flash('Invalid credentials')
     return render_template('login.html')
 
-
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    return redirect(url_for('login'))
-
-
-@app.route('/', methods=['GET', 'POST'])
-def add_product():
-    if 'username' not in session:
+@app.route('/home')
+def home():
+    if 'user' not in session:
         return redirect(url_for('login'))
+    return render_template('home.html')
 
+@app.route('/add_product', methods=['GET', 'POST'])
+def add_product():
     if request.method == 'POST':
-        product_name = request.form['product_name']
-        quantity = request.form['quantity']
+        name = request.form['product_name']
+        quantity = int(request.form['quantity'])
+        cur.execute("INSERT INTO products (name) VALUES (%s)", (name,))
+        db.commit()
+        cur.execute("SELECT LAST_INSERT_ID()")
+        product_id = cur.fetchone()[0]
+        # First, get the id of the warehouse
+        cur.execute("SELECT id FROM locations WHERE name = %s", ('warehouse',))
+        location_id = cur.fetchone()[0]
 
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO products (product_name, quantity) VALUES ( %s, %s)",
-                    (product_name, quantity))
-        
-        cur.execute("INSERT INTO warehouse (prd_name, qty) VALUES (%s, %s)",
-                    (product_name, quantity))
-        mysql.connection.commit()
-
-
-        mysql.connection.commit()
-
-        cur.close()
-        return redirect(url_for('view_products'))
-
+        # Then insert into inventory
+        cur.execute("INSERT INTO inventory (product_id, location_id, quantity) VALUES (%s, %s, %s)", (product_id, location_id, quantity))
+        db.commit()
+        flash('Product added to warehouse')
+        return redirect(url_for('home'))
     return render_template('add_product.html')
 
-
-@app.route('/products')
-def view_products():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM products")
-    products = cur.fetchall()
-    cur.close()
-    return render_template('view_products.html', products=products)
-
-
-@app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
-def edit_product(product_id):
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-    if request.method == 'POST':
-        product_name = request.form['product_name']
-        quantity = request.form['quantity']
-
-        cur.execute("UPDATE products SET product_name = %s, quantity = %s WHERE product_id = %s",
-                    (product_name, quantity, product_id))
-        mysql.connection.commit()
-        cur.close()
-        return redirect(url_for('view_products'))
-
-    cur.execute("SELECT * FROM products WHERE product_id = %s", (product_id,))
-    product = cur.fetchone()
-    cur.close()
-
-    if product:
-        return render_template('edit_product.html', product=product)
-    else:
-        return "Product not found."
-
-
-@app.route('/delete_product/<int:product_id>', methods=['POST'])
-def delete_product(product_id):
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM products WHERE product_id = %s", (product_id,))
-    mysql.connection.commit()
-    cur.close()
-    return redirect(url_for('view_products'))
-
-
-@app.route('/locations', methods=['GET', 'POST'])
-def manage_locations():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-    if request.method == 'POST':
-        location_id = request.form['location_id']
-        location_name = request.form['location_name']
-        cur.execute("INSERT INTO locations (location_id, location_name) VALUES (%s, %s)",
-                    (location_id, location_name))
-        mysql.connection.commit()
-
-    cur.execute("SELECT * FROM locations")
-    locations = cur.fetchall()
-    cur.close()
-    return render_template('locations.html', locations=locations)
-
-
-@app.route('/movements', methods=['GET', 'POST'])
-def product_movements():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
+@app.route('/move', methods=['GET', 'POST'])
+def move_products():
+    cur = db.cursor()  # ✅ Make sure this is here at the top of the function
     if request.method == 'POST':
         product_id = request.form['product_id']
         from_location = request.form['from_location']
         to_location = request.form['to_location']
-        qty = int(request.form['qty'])
-        status = request.form['status']
-        
-        cur.execute("INSERT INTO product_movements (product_id, from_location, to_location, qty, status) VALUES (%s, %s, %s, %s, %s)",
-                    (product_id, from_location, to_location, qty, status))
-        mysql.connection.commit()
+        quantity = int(request.form['quantity'])
 
-    cur.execute('''
-        SELECT 
-            p.product_name,
-            f.location_name AS from_location,
-            t.location_name AS to_location,
-            pm.qty,
-            pm.status,
-            pm.timestamp
-        FROM product_movements pm
-        JOIN products p ON pm.product_id = p.product_id
-        LEFT JOIN locations f ON pm.from_location = f.location_id
-        LEFT JOIN locations t ON pm.to_location = t.location_id
-        ORDER BY pm.timestamp DESC;
-    ''')
-    movements = cur.fetchall()
+        # Check if enough stock is available at from_location
+        cur.execute("SELECT quantity FROM inventory WHERE product_id=%s AND location_id=%s", (product_id, from_location))
+        result = cur.fetchone()
+        if not result or result[0] < quantity:
+            flash("Not enough stock at source location")
+            return redirect(url_for('move_products'))
 
-    cur.execute("SELECT product_id, product_name FROM products")
+        # Deduct from source
+        cur.execute("""
+            UPDATE inventory SET quantity = quantity - %s
+            WHERE product_id = %s AND location_id = %s
+        """, (quantity, product_id, from_location))
+
+        # Add to destination (insert if not exists)
+        cur.execute("""
+            INSERT INTO inventory (product_id, location_id, quantity)
+            VALUES (%s, %s, %s)
+            ON DUPLICATE KEY UPDATE quantity = quantity + %s
+        """, (product_id, to_location, quantity, quantity))
+
+        # Log movement (optional)
+        cur.execute("""
+            INSERT INTO movements (product_id, from_location_id, to_location_id, quantity)
+            VALUES (%s, %s, %s, %s)
+        """, (product_id, from_location, to_location, quantity))
+
+        db.commit()
+        flash("Product moved successfully")
+        return redirect(url_for('home'))
+
+    # Fetch locations and products for the form
+    cur.execute("SELECT id, name FROM locations")
+    locations = cur.fetchall()
+    cur.execute("SELECT id, name FROM products")
     products = cur.fetchall()
 
-    cur.execute("SELECT location_id, location_name FROM locations")
-    locations = cur.fetchall()
-
-    cur.close()
-    return render_template('movements.html', movements=movements, products=products, locations=locations)
-
-
-@app.route('/product_locations')
-def view_product_locations():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-    cur.execute('''
-        SELECT p.product_name, 
-            l.location_name, 
-            SUM(CASE WHEN pm.to_location = l.location_id THEN pm.qty ELSE 0 END) - 
-            SUM(CASE WHEN pm.from_location = l.location_id THEN pm.qty ELSE 0 END) AS qty
-        FROM products p
-        CROSS JOIN locations l
-        LEFT JOIN product_movements pm ON pm.product_id = p.product_id
-        GROUP BY p.product_name, l.location_name
-        HAVING qty > 0
-    ''')
-    products_location_data = cur.fetchall()
-    cur.close()
-
-    return render_template('product_locations.html', products_location_data=products_location_data)
+    return render_template("move_products.html", products=products, locations=locations)
 
 
 @app.route('/report')
 def report():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-
-    cur.execute('''
-                SELECT  * FROM warehouse
-                
-                ''')
-    warehouse_data = cur.fetchall()
-
-    cur.execute(''' 
-        SELECT p.product_name, COALESCE(l.location_name, 'N/A') AS warehouse, 
-            SUM(CASE WHEN pm.to_location = l.location_id THEN pm.qty ELSE 0 END) - 
-            SUM(CASE WHEN pm.from_location = l.location_id THEN pm.qty ELSE 0 END) AS qty
-        FROM products p
-        CROSS JOIN locations l
-        LEFT JOIN product_movements pm ON pm.product_id = p.product_id
-        GROUP BY p.product_name, l.location_name
-        HAVING qty != 0
-    ''')
-    report_data = cur.fetchall()
-    cur.close()
-
-    return render_template('report.html', report_data=report_data , warehouse_data=warehouse_data)
+    cur = db.cursor()
+    cur.execute("""
+        SELECT p.name AS product_name, l.name AS location_name, i.quantity
+        FROM inventory i
+        JOIN products p ON i.product_id = p.id
+        JOIN locations l ON i.location_id = l.id
+    """)
+    data = cur.fetchall()
+    return render_template('report.html', data=data)
 
 
-@app.route('/in_transit')
-def in_transit():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
-    cur = mysql.connection.cursor()
-    cur.execute(''' 
-        SELECT 
-            p.product_name,
-            pm.qty,
-            f.location_name AS from_warehouse,
-            t.location_name AS to_warehouse,
-            pm.timestamp
-        FROM product_movements pm
-        JOIN products p ON pm.product_id = p.product_id
-        LEFT JOIN locations f ON pm.from_location = f.location_id
-        LEFT JOIN locations t ON pm.to_location = t.location_id
-        WHERE pm.status = 'Pending'
-    ''')
+@app.route('/intransit')
+def intransit():
+    cur.execute("""
+        SELECT m.product_id, p.product_name, m.from_location_id, m.to_location_id, m.quantity, m.timestamp
+        FROM movements m
+        JOIN products p ON m.product_id = p.id
+        ORDER BY m.timestamp DESC
+    """)
     movements = cur.fetchall()
-    cur.close()
-
     return render_template('in_transit.html', movements=movements)
 
+@app.route('/add_location', methods=['GET', 'POST'])
+def add_location():
+    if request.method == 'POST':
+        location = request.form['location_name']
+        cur.execute("INSERT INTO locations (location_name) VALUES (%s)", (location,))
+        db.commit()
+        flash('Location added')
+        return redirect(url_for('home'))
+    return render_template('add_location.html')
 
-@app.route('/product_history/<int:product_id>')
-def product_history(product_id):
-    if 'username' not in session:
-        return redirect(url_for('login'))
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
 
-    cur = mysql.connection.cursor()
-    cur.execute(''' 
-        SELECT 
-            pm.timestamp,
-            pm.qty,
-            f.location_name AS from_location,
-            t.location_name AS to_location,
-            pm.status
-        FROM product_movements pm
-        LEFT JOIN locations f ON pm.from_location = f.location_id
-        LEFT JOIN locations t ON pm.to_location = t.location_id
-        WHERE pm.product_id = %s
-        ORDER BY pm.timestamp DESC
-    ''', (product_id,))
-    movements = cur.fetchall()
-
-    cur.execute("SELECT product_name FROM products WHERE product_id = %s", (product_id,))
-    product = cur.fetchone()
-    cur.close()
-
-    return render_template('product_history.html', product=product, movements=movements)
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

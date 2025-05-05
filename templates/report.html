@@ -1,47 +1,137 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Warehouse Stock</h2>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Product ID</th>
-            <th>Product</th>
-            <th>Available Quantity</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for val in warehouse_data %}
-        <tr>
-            <td>{{ val[0] }}</td>
-            <td>{{ val[1] }}</td>
-            <td>{{ val[2] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 70%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        a.button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a.button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Warehouse stock Report</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Location</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            {% if row[1]== "warehouse" %}
+            <tr>
+                <td>{{ row[0] }}</td>  <!-- product_name -->
+                <td>{{ row[1] }}</td>  <!-- location_name -->
+                <td>{{ row[2] }}</td>  <!-- quantity -->
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <h2>SHOP 1 report</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Location</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            {% if row[1]== "shop1" %}
+            <tr>
+                <td>{{ row[0] }}</td>  <!-- product_name -->
+                <td>{{ row[1] }}</td>  <!-- location_name -->
+                <td>{{ row[2] }}</td>  <!-- quantity -->
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <h2>SHOP 2 Report</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Location</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            {% if row[1]== "shop2" %}
+            <tr>
+                <td>{{ row[0] }}</td>  <!-- product_name -->
+                <td>{{ row[1] }}</td>  <!-- location_name -->
+                <td>{{ row[2] }}</td>  <!-- quantity -->
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
 
 
 
 
 
+    <h2>SHOP 3 Report</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Location</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            {% if row[1]== "shop3" %}
+            <tr>
+                <td>{{ row[0] }}</td>  <!-- product_name -->
+                <td>{{ row[1] }}</td>  <!-- location_name -->
+                <td>{{ row[2] }}</td>  <!-- quantity -->
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
 
-<h2>Inventory Report</h2>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Location</th>
-            <th>Available Quantity</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in report_data %}
-        <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock %}
+
+    
+    <a href="{{ url_for('home') }}" class="button">Back to Home</a>
+</body>
+</html>

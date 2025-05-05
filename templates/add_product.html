@@ -1,9 +1,15 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
 <h2>Add Product</h2>
-<form method="post">
-    <input type="text" name="product_name" placeholder="Product Name" required class="form-control mb-2">
-    <input type="number" name="quantity" placeholder="Initial Quantity" class="form-control mb-2">
-    <button type="submit" class="btn btn-success">Add Product</button>
+<form method="POST">
+    <div class="mb-3">
+        <label>Product Name</label>
+        <input type="text" name="product_name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Quantity</label>
+        <input type="number" name="quantity" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Add to Warehouse</button>
 </form>
 {% endblock %}
