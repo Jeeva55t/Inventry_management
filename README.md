@@ -1,53 +1,58 @@
-
-# 📦 Warehouse Inventory Management System
-
+📦 Warehouse Inventory Management System
 This is a Flask-based web application for managing warehouse inventory, including product registration, product movement across locations, and viewing stock reports.
 
-## 🔧 Features
+🔧 Features
+User Registration & Login
 
-- User Registration & Login
-- Add Products (default to Warehouse)
-- Move Products between locations
-- View Inventory Report by Location
-- View Product Movement History (InTransit)
-- Add New Locations
+Add Products (default to Warehouse)
 
-## 🛠️ Tech Stack
+Move Products between locations
 
-- **Backend**: Python, Flask
-- **Database**: MySQL
-- **Frontend**: HTML (Jinja2 templates), Bootstrap (optional)
-- **Session Management**: Flask Sessions
+View Inventory Report by Location
 
-## 🗂️ Table Structure (MySQL)
+View Product Movement History (InTransit)
 
-### 1. `users`
-```sql
+Add New Locations
+
+🛠️ Tech Stack
+Backend: Python, Flask
+
+Database: MySQL
+
+Frontend: HTML (Jinja2 templates), Bootstrap (optional)
+
+Session Management: Flask Sessions
+
+🗂️ Table Structure (MySQL)
+1. users
+sql
+Copy
+Edit
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL
 );
-```
-
-### 2. `products`
-```sql
+2. products
+sql
+Copy
+Edit
 CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
-```
-
-### 3. `locations`
-```sql
+3. locations
+sql
+Copy
+Edit
 CREATE TABLE locations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
-```
-
-### 4. `inventory`
-```sql
+4. inventory
+sql
+Copy
+Edit
 CREATE TABLE inventory (
     product_id INT,
     location_id INT,
@@ -56,10 +61,10 @@ CREATE TABLE inventory (
     FOREIGN KEY (product_id) REFERENCES products(id),
     FOREIGN KEY (location_id) REFERENCES locations(id)
 );
-```
-
-### 5. `movements`
-```sql
+5. movements
+sql
+Copy
+Edit
 CREATE TABLE movements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT,
@@ -71,35 +76,61 @@ CREATE TABLE movements (
     FOREIGN KEY (from_location_id) REFERENCES locations(id),
     FOREIGN KEY (to_location_id) REFERENCES locations(id)
 );
-```
-
-## 🚀 Getting Started
-
-### 1. Clone the Repository
-```bash
+🚀 Getting Started
+1. Clone the Repository
+bash
+Copy
+Edit
 git clone https://github.com/yourusername/warehouse-inventory.git
 cd warehouse-inventory
-```
-
-### 2. Install Requirements
-```bash
+2. Install Requirements
+bash
+Copy
+Edit
 pip install Flask mysqlclient
-```
+3. Configure Database
+Start MySQL and create a database named inventory.
 
-### 3. Configure Database
-
-- Start MySQL and create a database named `inventory`.
-```sql
+sql
+Copy
+Edit
 CREATE DATABASE inventory;
 USE inventory;
 -- Then create tables as described above
-```
+Update DB credentials in app.py:
 
-- Update DB credentials in `app.py`.
-
-### 4. Run the App
-```bash
+python
+Copy
+Edit
+db = MySQLdb.connect(host="localhost", user="root", passwd="YOUR_PASSWORD", db="inventory")
+4. Run the App
+bash
+Copy
+Edit
 python app.py
-```
+Navigate to: http://127.0.0.1:5000
 
-Visit [http://127.0.0.1:5000](http://127.0.0.1:5000)
+📁 Directory Structure
+arduino
+Copy
+Edit
+/templates
+    ├── login.html
+    ├── register.html
+    ├── home.html
+    ├── add_product.html
+    ├── move_products.html
+    ├── report.html
+    ├── in_transit.html
+    └── add_location.html
+app.py
+README.md
+🔐 Default Setup
+Add a default location named warehouse via the Add Location page before adding products.
+
+Products added will be stored in the warehouse by default.
+
+Product movement updates quantities between locations and logs the transfer in the movements table.
+
+📞 Contact
+For issues or suggestions, contact jeevanandv63@gmail.com
